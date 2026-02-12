@@ -79,6 +79,7 @@ select<Query extends string = '*'>(
 - `columns` (string, optional) - Comma-separated column list. Default: `'*'`. Supports:
   - Column selection: `'id,name,email'`
   - Column rename: `'id,name:display_name'`
+  - Type casting: `'salary::text'`
   - JSON traversal: `'metadata->theme'`
   - Related tables: `'id,posts(*)'`
 - `options.head` (boolean, optional) - If true, only returns count, no data
@@ -109,6 +110,9 @@ const { count } = await client.from('users').select('*', { head: true, count: 'e
 // JSON column
 const { data } = await client.from('users').select('metadata->theme')
 
+// Type casting (:: operator)
+const { data } = await client.from('people').select('full_name,salary::text')
+
 // Related tables
 const { data } = await client.from('users').select('id,name,posts(*)')
 ```
@@ -125,6 +129,7 @@ const { data } = await client.from('users').select('id,name,posts(*)')
 - **Notes:**
   - Basic column selection: Direct mapping
   - Column rename: Use `AS` alias: `SELECT name AS userName`
+  - Type casting: Use `CAST()`: `SELECT CAST(salary AS TEXT)` (SQLite supports limited types: TEXT, INTEGER, REAL, NUMERIC, BLOB)
   - JSON: Use `json_extract()`: `SELECT json_extract(metadata, '$.theme')`
   - Related tables: Requires JOIN logic, not automatic
   - Count: `SELECT COUNT(*) FROM users`
@@ -137,6 +142,7 @@ const { data } = await client.from('users').select('id,name,posts(*)')
 - Whitespace handling: Strips spaces except within quotes
 - Invalid column: Error from database on execution
 - JSON operators (->, ->>, #>, #>>): Require JSON support
+- Type casting (`::`) only in select columns (vertical filtering), not in filter conditions (horizontal filtering). Use computed fields for filtered casting.
 
 **Related:** insert(), update(), delete(), order(), limit(), eq()
 

@@ -127,6 +127,10 @@ Source files are in adjacent repo:
 - Database: `/Users/dennis/Projects/supabase-js/packages/core/postgrest-js/src/`
 - Auth: `/Users/dennis/Projects/supabase-js/packages/core/auth-js/src/`
 
+External docs:
+
+- PostgREST: https://docs.postgrest.org/en/v14/index.html
+
 Read source to extract:
 
 - Method signatures (with generics)
