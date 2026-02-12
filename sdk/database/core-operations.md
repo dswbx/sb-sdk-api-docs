@@ -81,7 +81,7 @@ select<Query extends string = '*'>(
   - Column rename: `'id,name:display_name'`
   - Type casting: `'salary::text'` (see [type-casting-reference.md](type-casting-reference.md))
   - JSON traversal: `'metadata->theme'`
-  - Related tables: `'id,posts(*)'`
+  - Resource embedding: `'id,posts(*)'` (see [resource-embedding.md](resource-embedding.md))
 - `options.head` (boolean, optional) - If true, only returns count, no data
 - `options.count` (string, optional) - Count algorithm:
   - `'exact'` - Accurate COUNT(*), slower
@@ -113,7 +113,7 @@ const { data } = await client.from('users').select('metadata->theme')
 // Type casting (:: operator)
 const { data } = await client.from('people').select('full_name,salary::text')
 
-// Related tables
+// Resource embedding (see resource-embedding.md for full reference)
 const { data } = await client.from('users').select('id,name,posts(*)')
 ```
 
@@ -131,10 +131,10 @@ const { data } = await client.from('users').select('id,name,posts(*)')
   - Column rename: Use `AS` alias: `SELECT name AS userName`
   - Type casting: Use `CAST()`: `SELECT CAST(salary AS TEXT)` — see [type-casting-reference.md](type-casting-reference.md) for full PG→SQLite type mapping
   - JSON: Use `json_extract()`: `SELECT json_extract(metadata, '$.theme')`
-  - Related tables: Requires JOIN logic, not automatic
+  - Resource embedding: Requires JOIN logic, not automatic — see [resource-embedding.md](resource-embedding.md)
   - Count: `SELECT COUNT(*) FROM users`
 - **Workarounds:**
-  - For related tables, manually construct JOINs
+  - For resource embedding, manually construct JOINs
   - Implement custom parser for nested select syntax
 
 **Edge Cases:**

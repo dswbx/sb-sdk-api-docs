@@ -13,7 +13,7 @@ sdk/
 ├── database/
 │   ├── README.md                 # Navigation guide
 │   ├── progress.md               # Track completion status
-│   └── [15 content files]        # Method documentation
+│   └── [16 content files]        # Method documentation
 └── auth/
     ├── README.md
     ├── progress.md

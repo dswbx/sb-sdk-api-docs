@@ -81,10 +81,11 @@
   - [x] rpc()
   - [x] Other specialized methods
 
-### Reference Docs [3/3] ✅
+### Reference Docs [4/4] ✅
 - [x] api-overview.md
 - [x] sqlite-compatibility-matrix.md
 - [x] type-casting-reference.md
+- [x] resource-embedding.md
 
 ---
 
@@ -92,7 +93,7 @@
 
 **All documentation complete!**
 
-### Files Created (15):
+### Files Created (16):
 1. progress.md - Progress tracking
 2. core-operations.md - 6 CRUD methods (HIGH)
 3. filters-comparison.md - 10 comparison filters (HIGH)
@@ -107,6 +108,7 @@
 12. api-overview.md - Complete method reference
 13. sqlite-compatibility-matrix.md - Comprehensive compatibility analysis
 14. type-casting-reference.md - PostgreSQL :: cast → SQLite CAST() mapping
+15. resource-embedding.md - Joins, spread, !inner, disambiguation, nested embedding
 
 ### Statistics:
 - **Total methods documented:** 66
