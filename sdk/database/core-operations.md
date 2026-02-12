@@ -79,7 +79,7 @@ select<Query extends string = '*'>(
 - `columns` (string, optional) - Comma-separated column list. Default: `'*'`. Supports:
   - Column selection: `'id,name,email'`
   - Column rename: `'id,name:display_name'`
-  - Type casting: `'salary::text'`
+  - Type casting: `'salary::text'` (see [type-casting-reference.md](type-casting-reference.md))
   - JSON traversal: `'metadata->theme'`
   - Related tables: `'id,posts(*)'`
 - `options.head` (boolean, optional) - If true, only returns count, no data
@@ -129,7 +129,7 @@ const { data } = await client.from('users').select('id,name,posts(*)')
 - **Notes:**
   - Basic column selection: Direct mapping
   - Column rename: Use `AS` alias: `SELECT name AS userName`
-  - Type casting: Use `CAST()`: `SELECT CAST(salary AS TEXT)` (SQLite supports limited types: TEXT, INTEGER, REAL, NUMERIC, BLOB)
+  - Type casting: Use `CAST()`: `SELECT CAST(salary AS TEXT)` — see [type-casting-reference.md](type-casting-reference.md) for full PG→SQLite type mapping
   - JSON: Use `json_extract()`: `SELECT json_extract(metadata, '$.theme')`
   - Related tables: Requires JOIN logic, not automatic
   - Count: `SELECT COUNT(*) FROM users`
@@ -142,7 +142,7 @@ const { data } = await client.from('users').select('id,name,posts(*)')
 - Whitespace handling: Strips spaces except within quotes
 - Invalid column: Error from database on execution
 - JSON operators (->, ->>, #>, #>>): Require JSON support
-- Type casting (`::`) only in select columns (vertical filtering), not in filter conditions (horizontal filtering). Use computed fields for filtered casting.
+- Type casting (`::`) only in select columns (vertical filtering), not in filter conditions (horizontal filtering). Use computed fields for filtered casting. Full reference: [type-casting-reference.md](type-casting-reference.md)
 
 **Related:** insert(), update(), delete(), order(), limit(), eq()
 
