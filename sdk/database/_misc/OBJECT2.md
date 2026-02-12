@@ -13,6 +13,7 @@ Simplified unified JSON format covering all 66 Database API methods.
 - Unified `single`/`maybeSingle` into `cardinality: "one" | "maybe" | "many"`
 - JSON access uses JSONPath (`$.path.to.key`) instead of SQL operators
 - `order` is always array format with consistent structure
+- Renamed `with` → `embed` with join type, hint, spread support
 
 ---
 
@@ -24,7 +25,7 @@ Simplified unified JSON format covering all 66 Database API methods.
   "from": "table",
   "schema": "public",
   "select": [...],
-  "with": {...},
+  "embed": {...},
   "where": {...},
   "order": [...],
   "limit": 10,
@@ -50,7 +51,7 @@ Simplified unified JSON format covering all 66 Database API methods.
     { "metadata": { "path": "$.theme.color", "as": "color" } },
     { "tags": { "path": "$[0]", "as": "first_tag" } }
   ],
-  "with": {
+  "embed": {
     "categories": {
       "as": "cats",
       "select": ["id", "name"],
@@ -58,6 +59,7 @@ Simplified unified JSON format covering all 66 Database API methods.
       "limit": 5
     },
     "reviews": {
+      "join": "inner",
       "select": ["rating", "comment"],
       "order": [{ "column": "created_at", "direction": "desc" }]
     }
@@ -313,6 +315,154 @@ Always array:
 
 ---
 
+## Embedding (Resource Joins)
+
+Embed related tables via foreign key relationships. Maps to PostgREST resource embedding / `table(cols)` syntax.
+
+### Structure
+
+```json
+"embed": {
+  "table_name": {
+    "as": "alias",
+    "join": "left",
+    "hint": "fk_column",
+    "spread": false,
+    "select": [...],
+    "embed": {...},
+    "where": {...},
+    "order": [...],
+    "limit": 10,
+    "offset": 0
+  }
+}
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `as` | string | table name | Alias in response |
+| `join` | `"left"` \| `"inner"` | `"left"` | Join type — `inner` excludes parent rows without matches |
+| `hint` | string | auto-detect | FK column name for disambiguation |
+| `spread` | boolean | `false` | Flatten embedded fields into parent |
+| `select` | array | `["*"]` | Columns from related table |
+| `embed` | object | — | Nested embedding (recursive) |
+| `where` | object | — | Filter on embedded resource |
+| `order` | array | — | Order within embedded resource |
+| `limit` | number | — | Limit embedded rows |
+| `offset` | number | — | Offset embedded rows |
+
+### Join Types
+
+**Left (default)** — all parent rows; embedded is `null`/`[]` if no match.
+
+```json
+{ "embed": { "actors": { "select": ["name"] } } }
+```
+
+**Inner** — only parent rows with matching embedded records.
+
+```json
+{ "embed": { "actors": { "join": "inner", "select": ["name"] } } }
+```
+
+→ `select('title, actors!inner(name)')` in supabase-js
+
+### Disambiguation
+
+When multiple FKs exist between two tables, use `hint` to specify which.
+
+```json
+{
+  "from": "orders",
+  "select": ["name"],
+  "embed": {
+    "addresses": [
+      { "as": "billing_address", "hint": "billing_address_id", "select": ["name"] },
+      { "as": "shipping_address", "hint": "shipping_address_id", "select": ["name"] }
+    ]
+  }
+}
+```
+
+→ `select('name, billing_address:addresses!billing_address_id(name), shipping_address:addresses!shipping_address_id(name)')` in supabase-js
+
+### Spread
+
+Flatten embedded fields into parent object instead of nesting.
+
+```json
+{
+  "from": "films",
+  "select": ["title"],
+  "embed": {
+    "directors": {
+      "spread": true,
+      "select": [{ "first_name": { "as": "director_name" } }]
+    }
+  }
+}
+```
+
+Result: `{ "title": "...", "director_name": "John" }` instead of `{ "title": "...", "directors": { ... } }`
+
+→ `select('title, ...directors(director_name:first_name)')` in supabase-js
+
+### Nested Embedding
+
+Embed within embeds recursively.
+
+```json
+{
+  "from": "actors",
+  "select": ["first_name"],
+  "embed": {
+    "roles": {
+      "select": ["character"],
+      "embed": {
+        "films": { "select": ["title", "year"] }
+      }
+    }
+  }
+}
+```
+
+→ `select('first_name, roles(character, films(title, year))')` in supabase-js
+
+### Embedded Filters vs Top-Level Filters
+
+**Embedded filter** — shapes related data, does NOT filter parent:
+
+```json
+{
+  "from": "films",
+  "select": ["*"],
+  "embed": {
+    "actors": {
+      "select": ["*"],
+      "where": { "first_name": { "$eq": "Jehanne" } }
+    }
+  }
+}
+```
+
+**Top-level filter via `!inner`** — filters parent rows:
+
+```json
+{
+  "from": "films",
+  "select": ["title"],
+  "embed": {
+    "actors": {
+      "join": "inner",
+      "select": ["*"],
+      "where": { "first_name": { "$eq": "Jehanne" } }
+    }
+  }
+}
+```
+
+---
+
 ## $meta Fields
 
 | Field | Type | Operations | Description |
@@ -352,7 +502,7 @@ Always array:
 | `function` | string | rpc | Function name |
 | `schema` | string | all | Schema name |
 | `select` | array | all | Columns to return |
-| `with` | object | query | Embedded relations |
+| `embed` | object | query/insert/update/delete | Embedded relations (resource joins) |
 | `where` | object | query/update/delete/rpc | Filters |
 | `values` | object/array | insert/update/upsert | Data |
 | `args` | object | rpc | Function arguments |
@@ -377,12 +527,12 @@ Always array:
 }
 ```
 
-### Query with join
+### Query with embedding
 ```json
 {
   "from": "posts",
   "select": ["id", "title"],
-  "with": {
+  "embed": {
     "author": { "select": ["name"] }
   },
   "where": {
@@ -506,7 +656,7 @@ When filtering on JSON fields:
 
 All 66 methods mapped:
 
-- **Core (6):** from, select, insert, update, delete, upsert
+- **Core (6+):** from, select, insert, update, delete, upsert, embed (joins)
 - **Comparison (10):** eq, neq, gt, gte, lt, lte, in, notIn, is→eq, isDistinct
 - **Pattern (6):** like, ilike, likeAllOf, likeAnyOf, ilikeAllOf, ilikeAnyOf
 - **Regex (2):** regex, iregex
