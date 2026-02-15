@@ -1,24 +1,6 @@
-# Database API Object Representation v3
+# Database API Object Representation AST
 
-Unified JSON format covering all 66+ Database API methods.
-
----
-
-## Changes from v2
-
-- `embed` → `join` (top-level, filtering only) + embed entries in `select` (data via JSON aggregate subqueries)
-- Select: key = output alias, `column` = source column name (replaces `as`/`property`)
-- Select: added `cast`, `aggregate`, `preCast` fields
-- Added top-level `group` for aggregate queries
-- Added `$is` operator (`true`/`false`/`"unknown"`/`null`)
-- Quantified ops: camelCase suffix (`$likeAny`/`$eqAll`) — replaces `$likeAnyOf`/`$likeAllOf`
-- Added quantified variants for all comparison/pattern/regex operators
-- `$not` is wrapper-only (dropped prefix form)
-- `defaultsToNull` → `$meta.missing: "null" | "default"`
-- Added `$meta.handling`, `$meta.timezone`, `$meta.columns`, `$meta.stripNulls`
-- Added `type: "put"` (full row replacement)
-- Extended RPC: `httpMethod`, `paramsType`, `inputType`
-- Dot notation for join columns in `where`/`order`
+Unified JSON format AST covering all 66+ Database API methods.
 
 ---
 
