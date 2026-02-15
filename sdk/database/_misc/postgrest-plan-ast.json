@@ -1,0 +1,946 @@
+{
+   "_description": "PostgREST ActionPlan JSON AST — faithful to the Haskell types in src/PostgREST/Plan/",
+
+   "read": {
+      "_request": "GET /articles?select=id,title,body,tags->>'category',author:authors!inner(name,email),comments(id,body,commenter:users(name))&author.name=eq.John&or=(title.fts(english).postgres,body.fts(english).postgres)&order=created_at.desc&comments.order=created_at.asc&limit=10",
+
+      "tag": "Db",
+      "dbActionPlan": {
+         "tag": "DbCrud",
+         "explain": false,
+         "crudPlan": {
+            "tag": "WrappedReadPlan",
+            "readPlan": {
+               "node": {
+                  "select": [
+                     {
+                        "field": {
+                           "name": "id",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "int8",
+                           "baseType": "int8",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     },
+                     {
+                        "field": {
+                           "name": "title",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "text",
+                           "baseType": "text",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     },
+                     {
+                        "field": {
+                           "name": "body",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "text",
+                           "baseType": "text",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     },
+                     {
+                        "field": {
+                           "name": "tags",
+                           "jsonPath": [
+                              {
+                                 "tag": "J2Arrow",
+                                 "operand": {
+                                    "tag": "JKey",
+                                    "value": "category"
+                                 }
+                              }
+                           ],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "jsonb",
+                           "baseType": "jsonb",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     }
+                  ],
+                  "from": { "schema": "api", "name": "articles" },
+                  "fromAlias": null,
+                  "where": [
+                     {
+                        "tag": "CoercibleExpr",
+                        "negate": false,
+                        "operator": "Or",
+                        "conditions": [
+                           {
+                              "tag": "CoercibleStmnt",
+                              "filter": {
+                                 "tag": "CoercibleFilter",
+                                 "field": {
+                                    "name": "title",
+                                    "jsonPath": [],
+                                    "toJson": false,
+                                    "toTsVector": { "language": "english" },
+                                    "irType": "text",
+                                    "baseType": "text",
+                                    "transform": null,
+                                    "default": null,
+                                    "fullRow": false
+                                 },
+                                 "opExpr": {
+                                    "negate": false,
+                                    "operation": {
+                                       "tag": "Fts",
+                                       "operator": "FilterFts",
+                                       "language": "english",
+                                       "value": "postgres"
+                                    }
+                                 }
+                              }
+                           },
+                           {
+                              "tag": "CoercibleStmnt",
+                              "filter": {
+                                 "tag": "CoercibleFilter",
+                                 "field": {
+                                    "name": "body",
+                                    "jsonPath": [],
+                                    "toJson": false,
+                                    "toTsVector": { "language": "english" },
+                                    "irType": "text",
+                                    "baseType": "text",
+                                    "transform": null,
+                                    "default": null,
+                                    "fullRow": false
+                                 },
+                                 "opExpr": {
+                                    "negate": false,
+                                    "operation": {
+                                       "tag": "Fts",
+                                       "operator": "FilterFts",
+                                       "language": "english",
+                                       "value": "postgres"
+                                    }
+                                 }
+                              }
+                           }
+                        ]
+                     }
+                  ],
+                  "order": [
+                     {
+                        "tag": "CoercibleOrderTerm",
+                        "field": {
+                           "name": "created_at",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "timestamptz",
+                           "baseType": "timestamptz",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "direction": "OrderDesc",
+                        "nullOrder": null
+                     }
+                  ],
+                  "range": {
+                     "lower": { "tag": "BoundaryBelow", "value": 0 },
+                     "upper": { "tag": "BoundaryAbove", "value": 9 }
+                  },
+                  "relName": "articles",
+                  "relToParent": null,
+                  "relJoinConds": [],
+                  "relAlias": null,
+                  "relAggAlias": "pgrst_agg_0",
+                  "relHint": null,
+                  "relJoinType": null,
+                  "relSpread": null,
+                  "relSelect": [
+                     {
+                        "tag": "JsonEmbed",
+                        "selName": "author",
+                        "aggAlias": "pgrst_agg_1",
+                        "embedMode": "JsonObject",
+                        "emptyEmbed": false
+                     },
+                     {
+                        "tag": "JsonEmbed",
+                        "selName": "comments",
+                        "aggAlias": "pgrst_agg_2",
+                        "embedMode": "JsonArray",
+                        "emptyEmbed": false
+                     }
+                  ],
+                  "depth": 0
+               },
+               "children": [
+                  {
+                     "node": {
+                        "select": [
+                           {
+                              "field": {
+                                 "name": "name",
+                                 "jsonPath": [],
+                                 "toJson": false,
+                                 "toTsVector": null,
+                                 "irType": "text",
+                                 "baseType": "text",
+                                 "transform": null,
+                                 "default": null,
+                                 "fullRow": false
+                              },
+                              "aggFunction": null,
+                              "aggCast": null,
+                              "cast": null,
+                              "alias": null
+                           },
+                           {
+                              "field": {
+                                 "name": "email",
+                                 "jsonPath": [],
+                                 "toJson": false,
+                                 "toTsVector": null,
+                                 "irType": "text",
+                                 "baseType": "text",
+                                 "transform": null,
+                                 "default": null,
+                                 "fullRow": false
+                              },
+                              "aggFunction": null,
+                              "aggCast": null,
+                              "cast": null,
+                              "alias": null
+                           }
+                        ],
+                        "from": { "schema": "api", "name": "authors" },
+                        "fromAlias": null,
+                        "where": [
+                           {
+                              "tag": "CoercibleStmnt",
+                              "filter": {
+                                 "tag": "CoercibleFilter",
+                                 "field": {
+                                    "name": "name",
+                                    "jsonPath": [],
+                                    "toJson": false,
+                                    "toTsVector": null,
+                                    "irType": "text",
+                                    "baseType": "text",
+                                    "transform": null,
+                                    "default": null,
+                                    "fullRow": false
+                                 },
+                                 "opExpr": {
+                                    "negate": false,
+                                    "operation": {
+                                       "tag": "OpQuant",
+                                       "operator": "OpEqual",
+                                       "quantifier": null,
+                                       "value": "John"
+                                    }
+                                 }
+                              }
+                           }
+                        ],
+                        "order": [],
+                        "range": {
+                           "lower": { "tag": "BoundaryBelowAll" },
+                           "upper": { "tag": "BoundaryAboveAll" }
+                        },
+                        "relName": "authors",
+                        "relToParent": {
+                           "tag": "Relationship",
+                           "table": { "schema": "api", "name": "articles" },
+                           "foreignTable": {
+                              "schema": "api",
+                              "name": "authors"
+                           },
+                           "isSelf": false,
+                           "cardinality": {
+                              "tag": "M2O",
+                              "constraint": "articles_author_id_fkey",
+                              "columns": [["author_id", "id"]]
+                           },
+                           "tableIsView": false,
+                           "foreignTableIsView": false
+                        },
+                        "relJoinConds": [
+                           {
+                              "source": {
+                                 "qi": { "schema": "api", "name": "articles" },
+                                 "field": "author_id"
+                              },
+                              "target": {
+                                 "qi": { "schema": "api", "name": "authors" },
+                                 "field": "id"
+                              }
+                           }
+                        ],
+                        "relAlias": "author",
+                        "relAggAlias": "pgrst_agg_1",
+                        "relHint": null,
+                        "relJoinType": "JTInner",
+                        "relSpread": null,
+                        "relSelect": [],
+                        "depth": 1
+                     },
+                     "children": []
+                  },
+                  {
+                     "node": {
+                        "select": [
+                           {
+                              "field": {
+                                 "name": "id",
+                                 "jsonPath": [],
+                                 "toJson": false,
+                                 "toTsVector": null,
+                                 "irType": "int8",
+                                 "baseType": "int8",
+                                 "transform": null,
+                                 "default": null,
+                                 "fullRow": false
+                              },
+                              "aggFunction": null,
+                              "aggCast": null,
+                              "cast": null,
+                              "alias": null
+                           },
+                           {
+                              "field": {
+                                 "name": "body",
+                                 "jsonPath": [],
+                                 "toJson": false,
+                                 "toTsVector": null,
+                                 "irType": "text",
+                                 "baseType": "text",
+                                 "transform": null,
+                                 "default": null,
+                                 "fullRow": false
+                              },
+                              "aggFunction": null,
+                              "aggCast": null,
+                              "cast": null,
+                              "alias": null
+                           }
+                        ],
+                        "from": { "schema": "api", "name": "comments" },
+                        "fromAlias": null,
+                        "where": [],
+                        "order": [
+                           {
+                              "tag": "CoercibleOrderTerm",
+                              "field": {
+                                 "name": "created_at",
+                                 "jsonPath": [],
+                                 "toJson": false,
+                                 "toTsVector": null,
+                                 "irType": "timestamptz",
+                                 "baseType": "timestamptz",
+                                 "transform": null,
+                                 "default": null,
+                                 "fullRow": false
+                              },
+                              "direction": "OrderAsc",
+                              "nullOrder": null
+                           }
+                        ],
+                        "range": {
+                           "lower": { "tag": "BoundaryBelowAll" },
+                           "upper": { "tag": "BoundaryAboveAll" }
+                        },
+                        "relName": "comments",
+                        "relToParent": {
+                           "tag": "Relationship",
+                           "table": { "schema": "api", "name": "articles" },
+                           "foreignTable": {
+                              "schema": "api",
+                              "name": "comments"
+                           },
+                           "isSelf": false,
+                           "cardinality": {
+                              "tag": "O2M",
+                              "constraint": "comments_article_id_fkey",
+                              "columns": [["id", "article_id"]]
+                           },
+                           "tableIsView": false,
+                           "foreignTableIsView": false
+                        },
+                        "relJoinConds": [
+                           {
+                              "source": {
+                                 "qi": { "schema": "api", "name": "articles" },
+                                 "field": "id"
+                              },
+                              "target": {
+                                 "qi": { "schema": "api", "name": "comments" },
+                                 "field": "article_id"
+                              }
+                           }
+                        ],
+                        "relAlias": null,
+                        "relAggAlias": "pgrst_agg_2",
+                        "relHint": null,
+                        "relJoinType": "JTLeft",
+                        "relSpread": null,
+                        "relSelect": [
+                           {
+                              "tag": "JsonEmbed",
+                              "selName": "commenter",
+                              "aggAlias": "pgrst_agg_3",
+                              "embedMode": "JsonObject",
+                              "emptyEmbed": false
+                           }
+                        ],
+                        "depth": 1
+                     },
+                     "children": [
+                        {
+                           "node": {
+                              "select": [
+                                 {
+                                    "field": {
+                                       "name": "name",
+                                       "jsonPath": [],
+                                       "toJson": false,
+                                       "toTsVector": null,
+                                       "irType": "text",
+                                       "baseType": "text",
+                                       "transform": null,
+                                       "default": null,
+                                       "fullRow": false
+                                    },
+                                    "aggFunction": null,
+                                    "aggCast": null,
+                                    "cast": null,
+                                    "alias": null
+                                 }
+                              ],
+                              "from": { "schema": "api", "name": "users" },
+                              "fromAlias": null,
+                              "where": [],
+                              "order": [],
+                              "range": {
+                                 "lower": { "tag": "BoundaryBelowAll" },
+                                 "upper": { "tag": "BoundaryAboveAll" }
+                              },
+                              "relName": "users",
+                              "relToParent": {
+                                 "tag": "Relationship",
+                                 "table": {
+                                    "schema": "api",
+                                    "name": "comments"
+                                 },
+                                 "foreignTable": {
+                                    "schema": "api",
+                                    "name": "users"
+                                 },
+                                 "isSelf": false,
+                                 "cardinality": {
+                                    "tag": "M2O",
+                                    "constraint": "comments_user_id_fkey",
+                                    "columns": [["user_id", "id"]]
+                                 },
+                                 "tableIsView": false,
+                                 "foreignTableIsView": false
+                              },
+                              "relJoinConds": [
+                                 {
+                                    "source": {
+                                       "qi": {
+                                          "schema": "api",
+                                          "name": "comments"
+                                       },
+                                       "field": "user_id"
+                                    },
+                                    "target": {
+                                       "qi": {
+                                          "schema": "api",
+                                          "name": "users"
+                                       },
+                                       "field": "id"
+                                    }
+                                 }
+                              ],
+                              "relAlias": "commenter",
+                              "relAggAlias": "pgrst_agg_3",
+                              "relHint": null,
+                              "relJoinType": "JTLeft",
+                              "relSpread": null,
+                              "relSelect": [],
+                              "depth": 2
+                           },
+                           "children": []
+                        }
+                     ]
+                  }
+               ]
+            }
+         }
+      }
+   },
+
+   "mutate": {
+      "_request": "POST /articles?select=id,title,author:authors(name)&on_conflict=title  Prefer: return=representation,resolution=merge-duplicates  Body: [{\"title\":\"Hello\",\"body\":\"World\",\"author_id\":1}]",
+
+      "tag": "Db",
+      "dbActionPlan": {
+         "tag": "DbCrud",
+         "explain": false,
+         "crudPlan": {
+            "tag": "MutateReadPlan",
+
+            "mutatePlan": {
+               "tag": "Insert",
+               "in": { "schema": "api", "name": "articles" },
+               "insCols": [
+                  {
+                     "name": "title",
+                     "jsonPath": [],
+                     "toJson": false,
+                     "toTsVector": null,
+                     "irType": "text",
+                     "baseType": "text",
+                     "transform": null,
+                     "default": null,
+                     "fullRow": false
+                  },
+                  {
+                     "name": "body",
+                     "jsonPath": [],
+                     "toJson": false,
+                     "toTsVector": null,
+                     "irType": "text",
+                     "baseType": "text",
+                     "transform": null,
+                     "default": null,
+                     "fullRow": false
+                  },
+                  {
+                     "name": "author_id",
+                     "jsonPath": [],
+                     "toJson": false,
+                     "toTsVector": null,
+                     "irType": "int8",
+                     "baseType": "int8",
+                     "transform": null,
+                     "default": null,
+                     "fullRow": false
+                  }
+               ],
+               "insBody": "[{\"title\":\"Hello\",\"body\":\"World\",\"author_id\":1}]",
+               "onConflict": {
+                  "resolution": "MergeDuplicates",
+                  "columns": ["title"]
+               },
+               "where": [],
+               "returning": ["id", "title", "author_id"],
+               "insPkCols": ["id"],
+               "applyDefs": true
+            },
+
+            "readPlan": {
+               "node": {
+                  "select": [
+                     {
+                        "field": {
+                           "name": "id",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "int8",
+                           "baseType": "int8",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     },
+                     {
+                        "field": {
+                           "name": "title",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "text",
+                           "baseType": "text",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     }
+                  ],
+                  "from": { "schema": "api", "name": "articles" },
+                  "fromAlias": null,
+                  "where": [],
+                  "order": [],
+                  "range": {
+                     "lower": { "tag": "BoundaryBelowAll" },
+                     "upper": { "tag": "BoundaryAboveAll" }
+                  },
+                  "relName": "articles",
+                  "relToParent": null,
+                  "relJoinConds": [],
+                  "relAlias": null,
+                  "relAggAlias": "pgrst_agg_0",
+                  "relHint": null,
+                  "relJoinType": null,
+                  "relSpread": null,
+                  "relSelect": [
+                     {
+                        "tag": "JsonEmbed",
+                        "selName": "author",
+                        "aggAlias": "pgrst_agg_1",
+                        "embedMode": "JsonObject",
+                        "emptyEmbed": false
+                     }
+                  ],
+                  "depth": 0
+               },
+               "children": [
+                  {
+                     "node": {
+                        "select": [
+                           {
+                              "field": {
+                                 "name": "name",
+                                 "jsonPath": [],
+                                 "toJson": false,
+                                 "toTsVector": null,
+                                 "irType": "text",
+                                 "baseType": "text",
+                                 "transform": null,
+                                 "default": null,
+                                 "fullRow": false
+                              },
+                              "aggFunction": null,
+                              "aggCast": null,
+                              "cast": null,
+                              "alias": null
+                           }
+                        ],
+                        "from": { "schema": "api", "name": "authors" },
+                        "fromAlias": null,
+                        "where": [],
+                        "order": [],
+                        "range": {
+                           "lower": { "tag": "BoundaryBelowAll" },
+                           "upper": { "tag": "BoundaryAboveAll" }
+                        },
+                        "relName": "authors",
+                        "relToParent": {
+                           "tag": "Relationship",
+                           "table": { "schema": "api", "name": "articles" },
+                           "foreignTable": {
+                              "schema": "api",
+                              "name": "authors"
+                           },
+                           "isSelf": false,
+                           "cardinality": {
+                              "tag": "M2O",
+                              "constraint": "articles_author_id_fkey",
+                              "columns": [["author_id", "id"]]
+                           },
+                           "tableIsView": false,
+                           "foreignTableIsView": false
+                        },
+                        "relJoinConds": [
+                           {
+                              "source": {
+                                 "qi": { "schema": "api", "name": "articles" },
+                                 "field": "author_id"
+                              },
+                              "target": {
+                                 "qi": { "schema": "api", "name": "authors" },
+                                 "field": "id"
+                              }
+                           }
+                        ],
+                        "relAlias": "author",
+                        "relAggAlias": "pgrst_agg_1",
+                        "relHint": null,
+                        "relJoinType": "JTLeft",
+                        "relSpread": null,
+                        "relSelect": [],
+                        "depth": 1
+                     },
+                     "children": []
+                  }
+               ]
+            }
+         }
+      }
+   },
+
+   "call": {
+      "_request": "POST /rpc/search_articles?select=id,title,score&limit=5  Body: {\"query\":\"postgres\",\"max_results\":10}",
+
+      "tag": "Db",
+      "dbActionPlan": {
+         "tag": "DbCrud",
+         "explain": false,
+         "crudPlan": {
+            "tag": "CallReadPlan",
+
+            "callPlan": {
+               "funCQi": { "schema": "api", "name": "search_articles" },
+               "funCParams": {
+                  "tag": "KeyParams",
+                  "params": [
+                     {
+                        "name": "query",
+                        "type": "text",
+                        "typeMaxLength": "",
+                        "required": true,
+                        "variadic": false
+                     },
+                     {
+                        "name": "max_results",
+                        "type": "int4",
+                        "typeMaxLength": "",
+                        "required": false,
+                        "variadic": false
+                     }
+                  ]
+               },
+               "funCArgs": {
+                  "tag": "DirectArgs",
+                  "args": {
+                     "query": { "tag": "Fixed", "value": "postgres" },
+                     "max_results": { "tag": "Fixed", "value": "10" }
+                  }
+               },
+               "funCScalar": false,
+               "funCSetOfScalar": false,
+               "funCFilterFields": [],
+               "funCReturning": ["id", "title", "score"]
+            },
+
+            "routine": {
+               "schema": "api",
+               "name": "search_articles",
+               "description": "Full-text search over articles",
+               "params": [
+                  {
+                     "name": "query",
+                     "type": "text",
+                     "typeMaxLength": "",
+                     "required": true,
+                     "variadic": false
+                  },
+                  {
+                     "name": "max_results",
+                     "type": "int4",
+                     "typeMaxLength": "",
+                     "required": false,
+                     "variadic": false
+                  }
+               ],
+               "returnType": {
+                  "tag": "SetOf",
+                  "pgType": {
+                     "tag": "Composite",
+                     "qi": { "schema": "api", "name": "articles" },
+                     "isStripped": false
+                  }
+               },
+               "volatility": "Stable",
+               "hasVariadic": false,
+               "isoLevel": null,
+               "funcSettings": []
+            },
+
+            "readPlan": {
+               "node": {
+                  "select": [
+                     {
+                        "field": {
+                           "name": "id",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "int8",
+                           "baseType": "int8",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     },
+                     {
+                        "field": {
+                           "name": "title",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "text",
+                           "baseType": "text",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     },
+                     {
+                        "field": {
+                           "name": "score",
+                           "jsonPath": [],
+                           "toJson": false,
+                           "toTsVector": null,
+                           "irType": "float8",
+                           "baseType": "float8",
+                           "transform": null,
+                           "default": null,
+                           "fullRow": false
+                        },
+                        "aggFunction": null,
+                        "aggCast": null,
+                        "cast": null,
+                        "alias": null
+                     }
+                  ],
+                  "from": { "schema": "api", "name": "search_articles" },
+                  "fromAlias": null,
+                  "where": [],
+                  "order": [],
+                  "range": {
+                     "lower": { "tag": "BoundaryBelow", "value": 0 },
+                     "upper": { "tag": "BoundaryAbove", "value": 4 }
+                  },
+                  "relName": "search_articles",
+                  "relToParent": null,
+                  "relJoinConds": [],
+                  "relAlias": null,
+                  "relAggAlias": "pgrst_agg_0",
+                  "relHint": null,
+                  "relJoinType": null,
+                  "relSpread": null,
+                  "relSelect": [],
+                  "depth": 0
+               },
+               "children": []
+            }
+         }
+      }
+   },
+
+   "_typeReference": {
+      "_description": "Quick reference for all ADT tags used in this AST",
+
+      "ActionPlan": ["Db", "NoDb"],
+      "DbActionPlan": ["DbCrud", "MayUseDb"],
+      "CrudPlan": ["WrappedReadPlan", "MutateReadPlan", "CallReadPlan"],
+      "MutatePlan": ["Insert", "Update", "Delete"],
+
+      "Cardinality": ["O2M", "M2O", "O2O", "M2M"],
+      "JoinType": ["JTInner", "JTLeft"],
+      "RelSelectField": ["JsonEmbed", "Spread"],
+      "RelJsonEmbedMode": ["JsonObject", "JsonArray"],
+      "SpreadType": ["ToOneSpread", "ToManySpread"],
+
+      "CoercibleLogicTree": ["CoercibleExpr", "CoercibleStmnt"],
+      "LogicOperator": ["And", "Or"],
+      "CoercibleFilter": ["CoercibleFilter", "CoercibleFilterNullEmbed"],
+
+      "OpExpr": "{ negate: bool, operation: Operation }",
+      "Operation": ["Op", "OpQuant", "In", "Is", "IsDistinctFrom", "Fts"],
+      "SimpleOperator": [
+         "OpNotEqual",
+         "OpContains",
+         "OpContained",
+         "OpOverlap",
+         "OpStrictlyLeft",
+         "OpStrictlyRight",
+         "OpNotExtendsRight",
+         "OpNotExtendsLeft",
+         "OpAdjacent"
+      ],
+      "QuantOperator": [
+         "OpEqual",
+         "OpGreaterThanEqual",
+         "OpGreaterThan",
+         "OpLessThanEqual",
+         "OpLessThan",
+         "OpLike",
+         "OpILike",
+         "OpMatch",
+         "OpIMatch"
+      ],
+      "FtsOperator": [
+         "FilterFts",
+         "FilterFtsPlain",
+         "FilterFtsPhrase",
+         "FilterFtsWebsearch"
+      ],
+      "IsVal": [
+         "IsNull",
+         "IsNotNull",
+         "IsTriTrue",
+         "IsTriFalse",
+         "IsTriUnknown"
+      ],
+
+      "AggregateFunction": ["Sum", "Avg", "Max", "Min", "Count"],
+      "OrderDirection": ["OrderAsc", "OrderDesc"],
+      "OrderNulls": ["OrderNullsFirst", "OrderNullsLast"],
+
+      "JsonOperation": ["JArrow", "J2Arrow"],
+      "JsonOperand": ["JKey", "JIdx"],
+
+      "Boundary": [
+         "BoundaryBelow",
+         "BoundaryAbove",
+         "BoundaryBelowAll",
+         "BoundaryAboveAll"
+      ],
+
+      "CallParams": ["KeyParams", "OnePosParam"],
+      "CallArgs": ["DirectArgs", "JsonArgs"],
+      "RpcParamValue": ["Fixed", "Variadic"],
+      "RetType": ["Single", "SetOf"],
+      "PgType": ["Scalar", "Composite"],
+      "FuncVolatility": ["Volatile", "Stable", "Immutable"],
+      "PreferResolution": ["MergeDuplicates", "IgnoreDuplicates"]
+   }
+}
