@@ -8,6 +8,21 @@ Core authentication flows for session management, sign in, sign up, sign out, an
 
 ---
 
+## Common Request Headers
+
+All HTTP requests to the GoTrue server include these headers automatically:
+
+| Header | Value | Notes |
+|--------|-------|-------|
+| `X-Client-Info` | `gotrue-js/<version>` | Client identification |
+| `X-Supabase-Api-Version` | `2024-01-01` | API version |
+| `Content-Type` | `application/json;charset=UTF-8` | POST/PUT/PATCH only |
+| `Authorization` | `Bearer <access_token>` | Authenticated requests only |
+
+When using `supabase-js` (not raw `auth-js`), the `apikey` header (anon/service key) is also injected by the HTTP client layer.
+
+---
+
 ## Session Management (5 methods)
 
 ### `getSession()`
@@ -86,6 +101,8 @@ getSession()
 
 - **Endpoint:** None (local operation)
 - **Refresh Endpoint (if expired):** `POST /token?grant_type=refresh_token`
+  - **Headers:** `Content-Type: application/json;charset=UTF-8`
+  - **Body:** `{ "refresh_token": "<refresh_token>" }`
 
 **Error Cases:**
 
@@ -168,10 +185,11 @@ setSession({ access_token, refresh_token })
 **GoTrue Backend Mapping:**
 
 - **Validation Endpoint:** `GET /user`
-  - **Headers:** `Authorization: Bearer <access_token>`
+  - **Headers:** `Authorization: Bearer <access_token>`, `X-Supabase-Api-Version: 2024-01-01`
   - **Response:** `{ id, email, user_metadata, ... }`
 - **Refresh Endpoint (if expired):** `POST /token?grant_type=refresh_token`
-  - **Body:** `{ refresh_token }`
+  - **Headers:** `Content-Type: application/json;charset=UTF-8`, `X-Supabase-Api-Version: 2024-01-01`
+  - **Body:** `{ "refresh_token": "<refresh_token>" }`
   - **Response:** `{ access_token, refresh_token, expires_in, user }`
 
 **Error Cases:**
@@ -252,7 +270,10 @@ refreshSession(currentSession?)
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `POST /token?grant_type=refresh_token`
-- **Request Body:** `{ refresh_token: string }`
+- **Headers:**
+  - `Content-Type: application/json;charset=UTF-8`
+  - `X-Supabase-Api-Version: 2024-01-01`
+- **Request Body:** `{ "refresh_token": "<refresh_token>" }`
 - **Response:**
 
 ```json
@@ -343,7 +364,9 @@ getUser(jwt?)
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `GET /user`
-- **Headers:** `Authorization: Bearer <jwt>`
+- **Headers:**
+  - `Authorization: Bearer <jwt>`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Response:**
 
 ```json
@@ -448,7 +471,8 @@ initialize()
 **GoTrue Backend Mapping:**
 
 - **PKCE Exchange:** `POST /token?grant_type=pkce`
-  - **Body:** `{ auth_code, code_verifier }`
+  - **Headers:** `Content-Type: application/json;charset=UTF-8`, `X-Supabase-Api-Version: 2024-01-01`
+  - **Body:** `{ "auth_code": "<code>", "code_verifier": "<verifier>" }`
   - **Response:** `{ access_token, refresh_token, user, ... }`
 
 **Callback URL Formats:**
@@ -583,6 +607,9 @@ signInWithPassword({ email, password })
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `POST /token?grant_type=password`
+- **Headers:**
+  - `Content-Type: application/json;charset=UTF-8`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Request Body:**
 
 ```json
@@ -732,13 +759,14 @@ signInWithOAuth({ provider: 'google' })
 
 **GoTrue Backend Mapping:**
 
-- **Authorization URL:** `GET /authorize`
+- **Authorization URL:** `GET /authorize` _(browser redirect, no fetch)_
   - **Query Params:**
     - `provider` - OAuth provider name
     - `redirect_to` - Callback URL
     - `code_challenge` - PKCE challenge (if enabled)
-    - `code_challenge_method` - 'S256'
-    - `scopes` - OAuth scopes
+    - `code_challenge_method` - `S256`
+    - `scopes` - OAuth scopes (space-separated)
+    - Any additional `options.queryParams` merged in
 - **Backend Flow:**
   1. Redirect user to provider OAuth consent
   2. Provider redirects back with code
@@ -922,6 +950,10 @@ signInWithOtp({ email or phone })
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `POST /otp`
+- **Query Params:** `redirect_to=<url>` (if `options.emailRedirectTo` provided - email only)
+- **Headers:**
+  - `Content-Type: application/json;charset=UTF-8`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Request Body (Email):**
 
 ```json
@@ -1053,6 +1085,9 @@ exchangeCodeForSession(authCode)
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `POST /token?grant_type=pkce`
+- **Headers:**
+  - `Content-Type: application/json;charset=UTF-8`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Request Body:**
 
 ```json
@@ -1262,6 +1297,10 @@ signUp({ phone, password })
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `POST /signup`
+- **Query Params:** `redirect_to=<url>` (if `options.emailRedirectTo` provided)
+- **Headers:**
+  - `Content-Type: application/json;charset=UTF-8`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Request Body (Email):**
 
 ```json
@@ -1420,16 +1459,12 @@ signOut({ scope })
 
 **GoTrue Backend Mapping:**
 
-- **Endpoint:** `POST /logout`
-- **Headers:** `Authorization: Bearer <jwt>`
-- **Request Body:**
-
-```json
-{
-  "scope": "global"
-}
-```
-
+- **Endpoint:** `POST /logout?scope=<scope>`
+- **Query Params:** `scope=global|local|others`
+- **Headers:**
+  - `Authorization: Bearer <jwt>`
+  - `X-Supabase-Api-Version: 2024-01-01`
+- **Request Body:** _(empty)_
 - **Response:** 204 No Content (success)
 
 **Scope Behavior Details:**
@@ -1609,6 +1644,10 @@ verifyOtp({ email, token, type })
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `POST /verify`
+- **Query Params:** `redirect_to=<url>` (if `options.redirectTo` provided)
+- **Headers:**
+  - `Content-Type: application/json;charset=UTF-8`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Request Body:**
 
 ```json
@@ -1616,10 +1655,18 @@ verifyOtp({ email, token, type })
   "email": "user@example.com",
   "token": "123456",
   "type": "email",
-  "redirect_to": "https://myapp.com/welcome",
   "gotrue_meta_security": {
     "captcha_token": "..."
   }
+}
+```
+
+- **Request Body (token hash from URL):**
+
+```json
+{
+  "token_hash": "def456...",
+  "type": "magiclink"
 }
 ```
 
@@ -1741,7 +1788,9 @@ reauthenticate()
 **GoTrue Backend Mapping:**
 
 - **Endpoint:** `GET /reauthenticate`
-- **Headers:** `Authorization: Bearer <jwt>`
+- **Headers:**
+  - `Authorization: Bearer <jwt>`
+  - `X-Supabase-Api-Version: 2024-01-01`
 - **Response:** 204 No Content (success, OTP sent)
 
 **Use Cases:**
