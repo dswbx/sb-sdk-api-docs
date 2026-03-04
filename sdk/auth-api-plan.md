@@ -447,18 +447,18 @@ Each method should document:
 
 Update after completing each file:
 
-**Completed:** 18/70 methods (25.7%)
+**Completed:** 68/70 methods (97.1%)
 
 - [x] api-overview.md (reference)
 - [x] core-authentication.md (13 methods)
 - [x] user-management.md (5 methods)
-- [ ] identity-linking.md (2 methods)
-- [ ] mfa.md (12 methods)
-- [ ] advanced-auth.md (6 methods)
-- [ ] admin-api.md (14 methods)
-- [ ] oauth-server.md (5 methods, brief)
-- [ ] oauth-admin.md (6 methods, brief)
-- [ ] utilities.md (2 methods, brief)
+- [x] identity-linking.md (2 methods)
+- [x] mfa.md (12 methods)
+- [x] advanced-auth.md (6 methods)
+- [x] admin-api.md (10 methods)
+- [x] oauth-server.md (5 methods, brief)
+- [x] oauth-admin.md (6 methods, brief)
+- [x] utilities.md (2 methods, brief)
 - [x] implementation-matrix.md (reference)
 
 **Completion Criteria:**

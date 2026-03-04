@@ -2,9 +2,9 @@
 
 Documentation for Supabase auth-js (GoTrue) APIs. Focus on understanding implementation patterns for building custom authentication backend.
 
-**Status:** In Progress
-**Total Methods:** ~70
-**Completed:** 18/70 (25.7%)
+**Status:** Complete
+**Total Methods:** 68
+**Completed:** 68/68 (100%)
 
 ---
 
@@ -34,30 +34,37 @@ Documentation for Supabase auth-js (GoTrue) APIs. Focus on understanding impleme
 **[User Management](./user-management.md)** [5/5] ✅
 - updateUser, resetPasswordForEmail, resend, getUserIdentities, onAuthStateChange
 
-**[Identity Linking](./identity-linking.md)** [0/2]
-- linkIdentity, unlinkIdentity
+**[Identity Linking](./identity-linking.md)** [2/2] ✅
+- linkIdentity (OAuth redirect + ID token overloads), unlinkIdentity
 
-**[Multi-Factor Authentication](./mfa.md)** [0/12]
-- Enrollment, challenges, verification, management, WebAuthn
+**[Multi-Factor Authentication](./mfa.md)** [12/12] ✅
+- Enrollment: enroll, webauthn.enroll
+- Challenges: challenge, webauthn.challenge
+- Verification: verify, webauthn.verify, challengeAndVerify
+- Management: unenroll, listFactors, getAuthenticatorAssuranceLevel
+- WebAuthn: authenticate, register
 
-**[Advanced Auth](./advanced-auth.md)** [0/6]
-- signInWithSSO, signInWithIdToken, signInWithWeb3, signInAnonymously, auto-refresh
+**[Advanced Auth](./advanced-auth.md)** [6/6] ✅
+- signInWithSSO, signInWithIdToken, signInWithWeb3, signInAnonymously, startAutoRefresh, stopAutoRefresh
 
 ---
 
 ### LOW Priority (30 methods) - Admin & Specialized 5% Usage
 
-**[Admin API](./admin-api.md)** [0/14]
-- User CRUD, invites, admin operations (brief format)
+**[Admin API](./admin-api.md)** [10/10] ✅
+- User CRUD: createUser, listUsers, getUserById, updateUserById, deleteUser
+- Invites: inviteUserByEmail, generateLink
+- Operations: signOut, mfa.listFactors, mfa.deleteFactor
 
-**[OAuth Server](./oauth-server.md)** [0/5]
-- Authorization details, grants (brief format)
+**[OAuth Server](./oauth-server.md)** [5/5] ✅
+- Consent: getAuthorizationDetails, approveAuthorization, denyAuthorization
+- Grants: listGrants, revokeGrant
 
-**[OAuth Admin](./oauth-admin.md)** [0/6]
-- Client management (brief format)
+**[OAuth Admin](./oauth-admin.md)** [6/6] ✅
+- Client CRUD: listClients, createClient, getClient, updateClient, deleteClient, regenerateClientSecret
 
-**[Utilities](./utilities.md)** [0/2]
-- JWT verification, helpers (brief format)
+**[Utilities](./utilities.md)** [2/2] ✅
+- getClaims (offline JWT verification via JWKS), isThrowOnErrorEnabled
 
 ---
 
@@ -86,8 +93,6 @@ Brief format:
 
 ## Implementation Complexity
 
-Instead of SQLite compatibility, analyze implementation complexity:
-
 - **✅ Simple** - Direct implementation (password auth, JWT, session management)
 - **⚠️ Moderate** - Requires integration (OAuth, email/SMS, rate limiting)
 - **❌ Complex** - Advanced infrastructure (SAML/SSO, MFA, Web3, OAuth server)
@@ -98,7 +103,6 @@ See [Implementation Matrix](./implementation-matrix.md) for full analysis.
 
 ## Source References
 
-Implementation source:
 - `/Users/dennis/Projects/supabase-js/packages/core/auth-js/src/GoTrueClient.ts`
 - `/Users/dennis/Projects/supabase-js/packages/core/auth-js/src/GoTrueAdminApi.ts`
 - `/Users/dennis/Projects/supabase-js/packages/core/auth-js/src/lib/webauthn.ts`
@@ -113,7 +117,7 @@ From auth-api-plan.md:
 
 - **Target:** GoTrue-compatible backend, TypeScript, non-mission-critical
 - **OAuth:** Major providers only (Google, GitHub, Apple)
-- **MFA:** LOW priority (deferred)
+- **MFA:** Documented at MEDIUM priority (full detail)
 - **Admin API:** Server-side only
-- **WebAuthn:** LOW priority (deferred)
-- **SSO/SAML:** LOW priority (deferred)
+- **WebAuthn:** Documented at MEDIUM priority (full detail within mfa.md)
+- **SSO/SAML:** Documented at MEDIUM priority (in advanced-auth.md)
