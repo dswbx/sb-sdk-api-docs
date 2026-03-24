@@ -1,7 +1,7 @@
 # Utilities
 
 **Category:** MEDIUM Priority | **Status:** ✅ Complete
-**Methods:** 3 (abortSignal, setHeader, throwOnError)
+**Methods:** 3 (abortSignal, setHeader, throwOnError) + 3 server endpoints
 
 Utility methods for request control, custom headers, and error handling.
 
@@ -319,6 +319,73 @@ try {
 **Related:** abortSignal(), setHeader()
 
 **Source:** PostgrestBuilder.ts:71-80
+
+---
+
+## Server Health Endpoints (non-SDK)
+
+These are PostgREST server-level HTTP endpoints, not supabase-js SDK methods. They require no schema, no auth, and no tables.
+
+### Root Endpoint (`GET /`)
+
+Returns the OpenAPI specification for the exposed schema. Served on the main API port.
+
+```bash
+curl http://localhost:3000/
+```
+
+Returns JSON OpenAPI spec. Can double as a basic health check on the main port.
+
+**Minimal valid response:**
+```json
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "",
+    "version": ""
+  },
+  "paths": {}
+}
+```
+
+### Admin Server Endpoints
+
+Served on a **separate port** configured via `admin-server-port` (e.g., 3001). Designed for container orchestration (Kubernetes liveness/readiness probes).
+
+#### `GET /live`
+
+**Purpose:** Liveness probe - confirms server process is running.
+
+```bash
+curl -I "http://localhost:3001/live"
+# HTTP/1.1 200 OK
+```
+
+Returns `200 OK` if the PostgREST process is alive. No DB connection check.
+
+#### `GET /ready`
+
+**Purpose:** Readiness probe - confirms server can serve requests.
+
+```bash
+curl -I "http://localhost:3001/ready"
+# HTTP/1.1 200 OK    (ready)
+# HTTP/1.1 503        (recovering - DB connection or schema cache not ready)
+```
+
+Checks:
+- Server process running
+- Connection pool available
+- Schema cache loaded
+
+Returns `503` when PostgREST is in a recovering state (e.g., DB connection lost, schema cache reload).
+
+**SQLite Compatibility:**
+- **`/live`**: Trivial - return 200 if process running
+- **`/ready`**: Check DB file accessible + schema loaded
+- No admin server separation needed for lightweight implementations
+
+**Added in:** PostgREST v10.0.0 (#1933, #2109)
 
 ---
 

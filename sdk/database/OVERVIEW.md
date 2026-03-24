@@ -120,6 +120,27 @@ Quick reference: all 66 methods with PostgREST params, signatures, descriptions,
 
 ---
 
+## Server Endpoints (non-SDK)
+
+These are PostgREST server endpoints, not supabase-js SDK methods. Accessed via direct HTTP requests.
+
+### Root / OpenAPI
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `GET /` | HTTP | Returns OpenAPI spec for the exposed schema |
+
+### Admin Server (separate port)
+
+Requires `admin-server-port` config. Used for container orchestration (k8s probes).
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `GET /live` | HTTP | Liveness probe - `200` if server process is running |
+| `GET /ready` | HTTP | Readiness probe - `200` if server, connection pool, and schema cache are ready; `503` if recovering |
+
+---
+
 ## See Also
 
 - [README.md](./README.md) - Database API documentation navigation guide

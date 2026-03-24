@@ -4,7 +4,9 @@
       "WebFetch(domain:github.com)",
       "Bash(wc:*)",
       "Bash(grep:*)",
-      "WebFetch(domain:docs.postgrest.org)"
+      "WebFetch(domain:docs.postgrest.org)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)"
     ]
   }
 }
